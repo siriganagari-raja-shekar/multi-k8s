@@ -35,9 +35,9 @@ jobs:
 
     - name: Build and push Docker images
       run: |
-        docker build -t rajashekar435/multi-client:latest -t  rajashekar435/multi-client:${{ github.sha }} -f ./client/Dockerfile ./client
+        docker build -t rajashekar435/multi-client:latest -t rajashekar435/multi-client:${{ github.sha }} -f ./client/Dockerfile ./client
         docker build -t rajashekar435/multi-server:latest -t rajashekar435/multi-server:${{ github.sha }} -f ./server/Dockerfile ./server
-        docker build -t rajashekar435/multi-worker:latest -t rajashekar435/multi-server:${{ github.sha }} -f ./worker/Dockerfile ./worker
+        docker build -t rajashekar435/multi-worker:latest -t rajashekar435/multi-worker:${{ github.sha }} -f ./worker/Dockerfile ./worker
         docker push rajashekar435/multi-client:latest
         docker push rajashekar435/multi-server:latest
         docker push rajashekar435/multi-worker:latest
