@@ -35,12 +35,22 @@ jobs:
 
     - name: Build and push Docker images
       run: |
-        docker build -t rajashekar435/multi-client -f ./client/Dockerfile ./client
-        docker build -t rajashekar435/multi-server -f ./server/Dockerfile ./server
-        docker build -t rajashekar435/multi-worker -f ./worker/Dockerfile ./worker
-        docker push rajashekar435/multi-client
-        docker push rajashekar435/multi-server
-        docker push rajashekar435/multi-worker
+        docker build -t rajashekar435/multi-client:latest -t  rajashekar435/multi-client:${{ github.sha }} -f ./client/Dockerfile ./client
+        docker build -t rajashekar435/multi-server:latest -t rajashekar435/multi-server:${{ github.sha }} -f ./server/Dockerfile ./server
+        docker build -t rajashekar435/multi-worker:latest -t rajashekar435/multi-server:${{ github.sha }} -f ./worker/Dockerfile ./worker
+        docker push rajashekar435/multi-client:latest
+        docker push rajashekar435/multi-server:latest
+        docker push rajashekar435/multi-worker:latest
+        docker push rajashekar435/multi-client:${{ github.sha }}
+        docker push rajashekar435/multi-server:${{ github.sha }}
+        docker push rajashekar435/multi-worker:${{ github.sha }}
 
     - name: Set up kubectl
       run: gcloud container clusters get-credentials multik8s-cluster --zone us-central1-a
+    
+    - name: Apply Kubernetes files
+      run: |
+        kubectl apply -f k8s
+        kubectl set image deployments/server-deployment server=rajashekar435/multi-server:${{ github.sha }}
+        kubectl set image deployments/client-deployment client=rajashekar435/multi-client:${{ github.sha }}
+        kubectl set image deployments/worker-deployment worker=rajashekar435/multi-worker:${{ github.sha }}
