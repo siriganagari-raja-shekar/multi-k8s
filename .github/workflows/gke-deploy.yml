@@ -1,0 +1,46 @@
+name: Deploy to GKE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    - name: 'Use gcloud CLI'
+      run: 'gcloud info'
+
+    - name: Configure Docker
+      run: |
+        echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+    
+    - name: Run tests
+      run: |
+        - docker build -t rajashekar435/client-test -f ./client/Dockerfile.dev ./client
+        - docker run -e CI=true rajashekar435/client-test npm run test -- --coverage
+
+    - name: Build and push Docker images
+      run: |
+        - docker build -t rajashekar435/multi-client -f ./client/Dockerfile ./client
+        - docker build -t rajashekar435/multi-server -f ./server/Dockerfile ./server
+        - docker build -t rajashekar435/multi-worker -f ./worker/Dockerfile ./worker
+        - docker push rajashekar435/multi-client
+        - docker push rajashekar435/multi-server
+        - docker push rajashekar435/multi-worker
+
+    - name: Set up kubectl
+      run: gcloud container clusters get-credentials multik8s-cluster --zone us-central1-a
