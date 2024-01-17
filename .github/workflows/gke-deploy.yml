@@ -46,7 +46,9 @@ jobs:
         docker push rajashekar435/multi-worker:${{ github.sha }}
 
     - name: Set up kubectl
-      run: gcloud container clusters get-credentials multik8s-cluster --zone us-central1-a
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        gcloud container clusters get-credentials multik8s-cluster --zone us-central1-a
     
     - name: Apply Kubernetes files
       run: |
