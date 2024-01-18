@@ -5,10 +5,35 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - www.raja-shekar.me
+    - raja-shekar.me
+    secretName: k8s-multi-com
   rules:
-  - http:
+  - host: raja-shekar.me
+    http:
+      paths:
+      - pathType: ImplementationSpecific
+        path: "/api(/|$)(.*)"
+        backend:
+          service:
+            name: server-cluster-ip-service
+            port: 
+              number: 5000
+      - pathType: ImplementationSpecific
+        path: "/()(.*)"
+        backend:
+          service:
+            name: client-cluster-ip-service
+            port: 
+              number: 3000
+  - host: www.raja-shekar.me
+    http:
       paths:
       - pathType: ImplementationSpecific
         path: "/api(/|$)(.*)"
