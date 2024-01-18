@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: k8s-multi-com-tls
+spec:
+  secretName: k8s-multi-com
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: raja-shekar.me
+  dnsNames:
+  - www.raja-shekar.me
+  - raja-shekar.me
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - www.raja-shekar.me
+      - raja-shekar.me
