@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  test-client:
     runs-on: ubuntu-latest
 
     steps:
